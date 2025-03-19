@@ -3,7 +3,20 @@
 import React from "react";
 import { DeviceCard } from "./DeviceCard";
 
-export const DeviceOverview: React.FC = () => {
+interface Home {
+  name: string;
+  address: string;
+  dwellers: { name: string; role: string }[];
+  devices: { title: string; icon: string; usageIcon: string; used: number; saved: number }[];
+}
+
+interface DeviceOverviewProps {
+  home: Home;
+  dwellers: any[];
+  devices : any[];
+}
+
+export const DeviceOverview: React.FC<DeviceOverviewProps> = ({ home, dwellers, devices}) => {
   return (
     <section className="flex flex-col mt-1 w-full">
       <div className="flex relative flex-col pt-3 pr-16 pb-8 pl-6 w-full rounded-xl min-h-[180px]">
@@ -13,9 +26,9 @@ export const DeviceOverview: React.FC = () => {
           alt="Background"
         />
         <div className="flex relative flex-col self-center max-w-full text-center text-stone-600 w-[220px]">
-          <h2 className="text-lg font-bold">Greenwood Residence</h2>
+          <h2 className="text-lg font-bold">{home ? home.name : ''}</h2>
           <p className="self-start mt-2 text-sm font-medium">
-            123 Eco Street, London, UK
+            {home ? home.address : ''}
           </p>
         </div>
 
@@ -23,21 +36,22 @@ export const DeviceOverview: React.FC = () => {
           <div className="flex flex-col items-start self-start">
             <h3 className="text-xs font-medium">Dwellers:</h3>
             <ul className="mt-2 space-y-1.5">
-              <li>Lelah Nickols (Home Manager)</li>
-              <li>Nicolas Jackson (Resident)</li>
-              <li>Robert b. lewis (Guest)</li>
-              <li className="font-thin">more ...</li>
-            </ul>
+            {dwellers.slice(0, 3).map((dweller, index) => (
+              <li key={index}>{dweller.name}</li>
+            ))}
+            {dwellers.length > 3 && <li className="font-thin">more ...</li>}
+          </ul>
+
           </div>
           <div className="flex flex-col items-start">
             <h3 className="text-xs font-medium">Devices:</h3>
             <ul className="mt-2 space-y-1.5">
-              <li>Living Room Lights</li>
-              <li>Kitchen AC</li>
-              <li>Smart Thermostat</li>
-              <li>Living Room Ceiling Fan</li>
-              <li className="font-thin">more ...</li>
+              {devices.slice(0, 4).map((device, index) => (
+                <li key={index}>{device.name}</li>
+              ))}
+              {devices.length > 4 && <li className="font-thin">more ...</li>}
             </ul>
+
           </div>
         </div>
       </div>

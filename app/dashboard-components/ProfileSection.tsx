@@ -14,7 +14,17 @@ const data = [
   { name: "Security", value: 25, color: "#86efac" },  // green-300
 ];
 
-export const ProfileSection: React.FC = () => {
+interface ProfileSectionProps {
+  managerData: {
+    name: string;
+    image: string;
+    role: string;
+    energySaved: string;
+  };
+}
+
+export const ProfileSection: React.FC<ProfileSectionProps> = ({ managerData }) => {
+  console.log("Manager data:", managerData);
   return (
     <section className="flex flex-col grow items-center px-6 pt-8 pb-4 w-full bg-[#FFFDEE] rounded-[50px]">
       <img
@@ -23,7 +33,7 @@ export const ProfileSection: React.FC = () => {
         alt={`${currentUser.name}'s profile picture`}
       />
       <h2 className="mt-4 text-lg font-semibold text-black">
-        Welcome {currentUser.name.split(' ')[0]}!
+        Welcome {managerData.name.split(' ')[0]}!
       </h2>
 
       <div className="flex flex-col self-stretch px-3 py-5 mt-5 bg-[#EEECDE] rounded-[53px]">

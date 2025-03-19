@@ -1,13 +1,28 @@
-import Login from "./login-page-components/Login";
- //import Login from "./homes-page-components/HomeSelection";
-// import Login from "./dashboard-components/MainDashboard";
-// import Login from "./devices-page-components/Devices";
-// import Login from "./dwellers-page-components/Dwellers";
-// import Login from "./energy-page-components/Dashboard";
-// import Login from "./notification-page-components/NotificationPage";
-// import Login from "./settings-page-components/Settings";
-// import Login from "./eco-hive-login";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation"; 
+import { useAuth } from "./contexts/AuthContext";
 
 export default function Home() {
-  return <Login />;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isAuthenticated, logout, login } = useAuth(); // Added logout and login
+
+  useEffect(() => {
+    const hubId = searchParams.get("hub_id");
+
+    if (hubId && isAuthenticated) {
+      // If hub_id is present and user is authenticated, log out
+      logout();
+    }
+    if (isAuthenticated){
+      router.push("/homes-page-components");
+    } else {
+      router.push(hubId ? `/login?hub_id=${hubId}` : "/login");
+    }
+
+  }, [isAuthenticated, router, searchParams, logout]);
+
+  return null; 
 }

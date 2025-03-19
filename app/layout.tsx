@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "./contexts/AuthContext";
+
 
 // Load the Montserrat font
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -28,7 +30,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={montserrat.className}>{children}</body>
+      <body className={montserrat.className}>
+        <AuthProvider> {/* Wrap everything inside AuthProvider */}
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }

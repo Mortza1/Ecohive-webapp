@@ -1,4 +1,4 @@
-import Login from "../login-page-components/Login"
+import Login from "./Login"
 
 
 

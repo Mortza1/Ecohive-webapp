@@ -1,17 +1,41 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { BackButton } from "./BackButton";
 import { HomeCard } from "./HomeCard";
-import { homes } from "../data/homes";
-import { Home } from "../types/home";
+import { getHomes } from "../api/actions";
 
 const HomeSelection: React.FC = () => {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedHome, setSelectedHome] = useState<Home>(homes[0]);
+  const [selectedHome, setSelectedHome] = useState<any>(null);
+  const [homes, setHomes] = useState<any[]>([]); // State to hold the list of homes
+
+  useEffect(() => {
+    const fetchHomes = async () => {
+      try {
+        const manager_id = localStorage.getItem("authToken");
+        if (!manager_id) {
+          console.error("No manager ID found in localStorage");
+          return;
+        }
+
+        // Fetch homes dynamically from the API
+        const homesData = await getHomes({ manager_id });
+        console.log(homesData, 'pppppppp')
+        if (homesData && homesData.homes) {
+          setHomes(homesData.homes);
+          setSelectedHome(homesData.homes[0]); // Set the first home as the default selected one
+        }
+      } catch (error) {
+        console.error("Error fetching homes:", error);
+      }
+    };
+
+    fetchHomes();
+  }, []);
 
   return (
     <>
@@ -36,11 +60,13 @@ const HomeSelection: React.FC = () => {
           <div className="flex flex-col items-center gap-8">
             {/* HomeCard and Dropdown side by side */}
             <div className="flex gap-8 items-center justify-center max-md:flex-col">
-              <HomeCard
-                name={selectedHome.name}
-                address={selectedHome.address}
-                // imageUrl={selectedHome.image}
-              />
+              {selectedHome && (
+                <HomeCard
+                  name={selectedHome.name}
+                  address={selectedHome.address}
+                  // imageUrl={selectedHome.image}
+                />
+              )}
               
               {/* Dropdown Button */}
               <div className="relative">
@@ -48,7 +74,7 @@ const HomeSelection: React.FC = () => {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-4 px-6 py-3 bg-amber-50 rounded-xl text-stone-600 hover:bg-amber-100 transition-colors"
                 >
-                  <span className="font-medium">{selectedHome.name}</span>
+                  <span className="font-medium">{selectedHome?.name || "Select Home"}</span>
                   <svg
                     className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                     fill="none"
@@ -64,7 +90,7 @@ const HomeSelection: React.FC = () => {
                   <div className="absolute top-full left-0 mt-2 w-full bg-amber-50 rounded-xl shadow-lg overflow-hidden z-10">
                     {homes.map((home) => (
                       <button
-                        key={home.id}
+                        key={home._id}
                         onClick={() => {
                           setSelectedHome(home);
                           setIsDropdownOpen(false);
@@ -92,4 +118,5 @@ const HomeSelection: React.FC = () => {
     </>
   );
 };
+
 export default HomeSelection;

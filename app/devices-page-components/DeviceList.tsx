@@ -1,9 +1,77 @@
 "use client";
+
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { DeviceTableHeader } from "./DeviceTableHeader";
 import { DeviceTableRow } from "./DeviceTableRow";
+import { getDevices, getHomes, getHomeUsers } from "../api/actions";
+
+
 
 export const DeviceList: React.FC = () => {
+  const [devices, setDevices] = useState<any[]>([]); // State for storing devices
+  const [searchTerm, setSearchTerm] = useState(""); // Search term for devices
+  const [filteredDevices, setFilteredDevices] = useState<any[]>([]); // Filtered devices based on search term
+  const [managerId, setManagerId] = useState<string>(''); 
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const manager_id = localStorage.getItem("authToken"); // Get manager ID from localStorage
+        if (!manager_id) {
+          console.error("No manager ID found in localStorage");
+          return;
+        }
+  
+        setManagerId(manager_id); // Set manager ID in state
+  
+        // Fetch homes data
+        const homes = await getHomes({ manager_id: manager_id ?? '' });
+        if (!homes || !homes.homes || homes.homes.length === 0) {
+          console.error("No homes found");
+          return;
+        }
+  
+        const hub_id = homes.homes[0].hub_id;
+        if (!hub_id) {
+          console.error("No hub ID found in home data");
+          return;
+        }
+  
+        // Fetch devices
+        const devicesResponse = await getDevices({ user_id: manager_id, hub_id: hub_id });
+        if (!devicesResponse || !devicesResponse.devices) {
+          console.warn("Devices response is invalid or empty");
+          setDevices([]); // Set devices to an empty array
+          return;
+        }
+  
+        console.log("Fetched devices:", devicesResponse);
+        setDevices(devicesResponse.devices || []);
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+        setDevices([]); // Fail-safe: Ensure devices is always an array
+      }
+    };
+  
+    fetchData(); // Call the async function
+  }, []);
+  
+
+  // Handle search functionality
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+
+    if (event.target.value === "") {
+      setFilteredDevices(devices);
+    } else {
+      const filtered = devices.filter((device) =>
+        device.name.toLowerCase().includes(event.target.value.toLowerCase())
+      );
+      setFilteredDevices(filtered);
+    }
+  };
+
   return (
     <main className="ml-5 w-[81%] max-md:ml-0 max-md:w-full">
       <div className="flex flex-col mt-9 w-full max-md:mt-10 max-md:max-w-full">
@@ -13,6 +81,8 @@ export const DeviceList: React.FC = () => {
             <input
               type="text"
               placeholder="Search for devices"
+              value={searchTerm}
+              onChange={handleSearch}
               className="my-auto bg-transparent outline-none"
             />
             <img
@@ -33,28 +103,19 @@ export const DeviceList: React.FC = () => {
 
         <DeviceTableHeader />
 
-        <DeviceTableRow
-          name="Living Room Chandelier"
-          type="Lights"
-          status="ON"
-        />
-        <DeviceTableRow
-          name="Dining Room Fan"
-          type="Ceiling Fan"
-          status="OFF"
-        />
-        <DeviceTableRow name="Bedroom Speakers" type="Speakers" status="OFF" />
-        <DeviceTableRow
-          name="Front Door Camera"
-          type="Security Camera"
-          status="ON"
-        />
-        <DeviceTableRow name="Room Thermostat" type="Thermostat" status="ON" />
-        <DeviceTableRow
-          name="Living room Speakers"
-          type="Speakers"
-          status="ON"
-        />
+        {/* Map over filtered devices */}
+        {devices.length > 0 ? (
+          devices.map((device) => (
+            <DeviceTableRow
+              key={device._id}
+              name={device.name}
+              type={device.type}
+              status={device.current_data ? "ON" : "OFF"} 
+            />
+          ))
+        ) : (
+          <p className="text-center mt-4">No devices found.</p>
+        )}
       </div>
     </main>
   );
