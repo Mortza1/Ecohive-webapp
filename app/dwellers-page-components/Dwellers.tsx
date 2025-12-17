@@ -40,6 +40,7 @@ export default function Dwellers() {
             const users = await getHomeUsers({ 'user_ids': user_ids });
             console.log("Fetched users:", users);
             setDwellers(users['users']);
+            console.log("Dwellers:", users['users']);
           } else {
             console.warn("No user IDs found");
             setDwellers([]); // No users found, set an empty array

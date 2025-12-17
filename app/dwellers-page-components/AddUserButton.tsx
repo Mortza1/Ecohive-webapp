@@ -17,6 +17,7 @@ export const AddUserButton: React.FC<AddUserButtonProps> = ({ manager_id, house_
     image: "https://cdn.builder.io/api/v1/image/assets/e97f4b049aa04c0fb59c904d1d337327/141d624aa64764dbd3b4950c64b8a5532929dede97a67787f0eb1b370f9b25c8",
     energySaved: "0KW"
   });
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,17 +37,17 @@ export const AddUserButton: React.FC<AddUserButtonProps> = ({ manager_id, house_
       role: 'Home Manager'
     };
 
+    setIsLoading(true); // Start loading
     try {
       // Call sendInvite method instead of adding the user directly
       await sendInvite({ manager_id, house_id, email: newUser.email });
-
-      // Update local users array and close modal (simulate user addition)
-      users.push(userToAdd);
       setIsModalOpen(false);
       window.location.reload();
     } catch (error) {
       console.error('Error sending invite:', error);
       setError(error instanceof Error ? error.message : 'Failed to send invite');
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -94,9 +95,14 @@ export const AddUserButton: React.FC<AddUserButtonProps> = ({ manager_id, house_
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#9CAD88] text-white rounded-md hover:bg-[#8b9b78] transition-colors"
+                  className={`px-4 py-2 bg-[#9CAD88] text-white rounded-md hover:bg-[#8b9b78] transition-colors ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
+                  disabled={isLoading} // Disable button while loading
                 >
-                  Send Invite
+                 {isLoading ? (
+                    <div style={{ border: '4px solid #f3f3f3', borderTop: '4px solid #000', borderRadius: '50%', width: '20px', height: '20px', animation: 'spin 2s linear infinite' }}></div>
+                  ) : (
+                    'Send Invite'
+                  )}
                 </button>
               </div>
             </form>

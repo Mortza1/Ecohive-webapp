@@ -20,6 +20,7 @@ interface ProfileSectionProps {
     image: string;
     role: string;
     energySaved: string;
+    gender: string;
   };
 }
 
@@ -28,7 +29,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ managerData }) =
   return (
     <section className="flex flex-col grow items-center px-6 pt-8 pb-4 w-full bg-[#FFFDEE] rounded-[50px]">
       <img
-        src={currentUser.image}
+        src={managerData.gender == 'male' ? 'man.png' : 'woman.png'}
         className="object-contain rounded-full aspect-[1.1] w-[65px]"
         alt={`${currentUser.name}'s profile picture`}
       />

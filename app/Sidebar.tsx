@@ -126,36 +126,7 @@ export const Sidebar: React.FC = () => {
             <span>Notifications</span>
           </Link>
 
-          <div className="relative">
-            <button 
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-4 p-3 rounded-xl bg-[#9CAD88] shadow-md text-stone-600 w-full hover:bg-[#8b9b78] transition-colors"
-            >
-              <span>{selectedHome.name}</span>
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/e97f4b049aa04c0fb59c904d1d337327/14a29b276f9fa7247203d23e3c249148349565fd41cf0e78a817dca439ea1f7a"
-                className={`w-6 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                alt="Location icon"
-              />
-            </button>
-
-            {isDropdownOpen && (
-              <div className="absolute top-full left-0 w-full mt-2 bg-[#9CAD88] rounded-xl shadow-lg overflow-hidden">
-                {homes.map((home) => (
-                  <button
-                    key={home.id}
-                    onClick={() => {
-                      setSelectedHome(home);
-                      setIsDropdownOpen(false);
-                    }}
-                    className="flex items-center gap-4 p-3 w-full text-stone-600 hover:bg-[#8b9b78] transition-colors"
-                  >
-                    <span>{home.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+         
         </div>
       </nav>
 
